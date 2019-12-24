@@ -35,12 +35,12 @@ app.get('/client.js', function(request, response) {
 app.post('/addUser', jsonParser, function(request, response) {
 
   console.log('a post request')
-var req = request;
+
 // if ./.data/sqlite.db does not exist, create it, otherwise print records to console
 var mysql = require('mysql');
 
 var con = mysql.createConnection({
-  host: "35.223.78.64",
+  host: "10.1.0.3",
   user: "root",
   password: "test",
   database: "mydb"
@@ -48,22 +48,45 @@ var con = mysql.createConnection({
 
 con.connect(function(err) {
   if (err) throw err;
-  console.log("Connected!");
-
+  console.log("mysql Connected!");
   
   let createusers = `create table if not exists users(
                           name varchar(255) primary key,
-                          favorite-color varchar(255),
-                          cats-or-dogs varchar(255)
+                          favoritecolor varchar(255),
+                          catsordogs varchar(255)
                       )`;
-  console.log('New table users Created!');
-  var sql = "INSERT INTO userlist (name, favorite-color, cats-or-dogs) VALUES ('"+reqest.body.name+"','"+reqest.body.favorite-color+"','"+reqest.body.cats-or-dogs+"')";
-  con.query(sql, function (err, result) {
+
+  con.query(createusers, function(err, results, fields) {
+    if (err) {
+      console.log(err.message);
+    }
+     console.log("user table created.")
+  });
+
+  var username = request.body.name;
+  var color = request.body.favoritecolor;
+  var catdog = request.body.catsordogs;
+
+  var sql = 'INSERT INTO users (name, favoritecolor, catsordogs) VALUES (?, ?, ? ) ON DUPLICATE KEY UPDATE favoritecolor = VALUES (favoritecolor), catsordogs = VALUES (catsordogs)';
+  con.query(sql,[username, color, catdog], function (err, result) {
     if (err) throw err;
     console.log("1 record inserted");
+    });
+
+  con.query('SELECT * from users', function(err, rows) {
+        response.send(rows);
+    });
+
+ 
+  con.end(function(err) {
+    if (err) {
+      return console.log(err.message);
+    }
   });
+//con.connect
 });
 
+//app.post
 });
 
 
@@ -71,5 +94,4 @@ con.connect(function(err) {
 var listener = app.listen(port, function() {
   console.log('Your app is listening on port ' + listener.address().port);
 });
-
 
