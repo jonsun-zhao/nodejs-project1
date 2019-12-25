@@ -69,7 +69,6 @@
       name: mysql
       state: present
       path: '{{ project_path }}'
-      global: yes
     sudo: yes
 
   - name: Node.js app | Install express
@@ -77,7 +76,6 @@
       name: express
       state: present
       path: '{{ project_path }}'
-      global: yes
     sudo: yes
     
 
@@ -86,7 +84,6 @@
       name: body-parser
       state: present
       path: '{{ project_path }}'
-      global: yes
     sudo: yes
 
   - name: NODE | Stop APP
